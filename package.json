@@ -1,0 +1,19 @@
+{
+  "name": "fullstackopen_bloglist",
+  "version": "1.0.0",
+  "description": "Application that allows users to save information about interesting blogs they have stumbled across on the internet.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Juanvr/fullstackopen_bloglist.git"
+  },
+  "author": "Juan Velázquez Romera",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Juanvr/fullstackopen_bloglist/issues"
+  },
+  "homepage": "https://github.com/Juanvr/fullstackopen_bloglist#readme"
+}
