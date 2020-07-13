@@ -8,7 +8,11 @@ const logger = require('./utils/logger');
 const mongoose = require('mongoose');
 
 
-const mongoUrl = config.MONGODB_URI;
+let mongoUrl = config.MONGODB_URI;
+if (process.env.NODE_ENV === 'test') {
+    mongoUrl = config.TEST_MONGODB_URI;
+}
+
 mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
         logger.info('connected to MongoDB');
