@@ -30,85 +30,128 @@ beforeEach(async () => {
     await blogObject.save();
 });
 
-test('blogs are returned as json', async () => {
-    await api
-        .get('/api/blogs')
-        .expect(200)
-        .expect('Content-Type', /application\/json/);
+describe('get requests', () => {
+
+    test('blogs are returned as json', async () => {
+        await api
+            .get('/api/blogs')
+            .expect(200)
+            .expect('Content-Type', /application\/json/);
+    });
+
+
+    test('there are two blogs', async () => {
+        const response = await api.get('/api/blogs');
+
+        expect(response.body).toHaveLength(2);
+    });
+
+    test('a specific blog is within the returned blogs', async () => {
+        const response = await api.get('/api/blogs');
+
+        const contents = response.body.map(r => r.author);
+
+        expect(contents).toContain(
+            'Felix'
+        );
+    });
 });
 
+describe('blogs structure', () => {
+    test('blogs have id property defined', async () => {
+        const response = await api.get('/api/blogs');
 
-
-test('there are two blogs', async () => {
-    const response = await api.get('/api/blogs');
-
-    expect(response.body).toHaveLength(2);
+        expect(response.body[0]['id']).toBeDefined();
+    });
 });
 
-test('a specific blog is within the returned blogs', async () => {
-    const response = await api.get('/api/blogs');
+describe('create requests', () => {
 
-    const contents = response.body.map(r => r.author);
+    test('create a blog works', async () => {
+        const newBlog =
+            {
+                title : 'Summer',
+                author : 'Cat',
+                url : 'http://estrella.com',
+                likes: 1
+            };
 
-    expect(contents).toContain(
-        'Felix'
-    );
+
+        await api.post('/api/blogs').send(newBlog).expect(201);
+
+        const response = await api.get('/api/blogs');
+        expect(response.body).toHaveLength(3);
+
+        const dbResponse = await Blog.find( { 'title':'Summer' } );
+        expect(dbResponse).toBeDefined();
+    });
+
+    test('create a blog without likes info defaults to likes = 0', async () => {
+        const newBlog =
+            {
+                title : 'Opera',
+                author : 'Figaro',
+                url : 'http://teatro.com'
+            };
+
+
+        await api.post('/api/blogs', newBlog).send(newBlog).expect(201);
+
+        await api.get('/api/blogs').expect(200);
+
+        const dbResponse = await Blog.findOne( { 'title':'Opera' } );
+        expect(dbResponse['likes']).toBe(0);
+    });
+
+    test('trying to create a blog without title or url results in a 400 Bad Request error', async () => {
+        const newBlog =
+            {
+                author : 'Puma'
+            };
+
+
+        await api.post('/api/blogs', newBlog).send(newBlog).expect(400);
+
+    });
 });
 
-test('blogs have id property defined', async () => {
-    const response = await api.get('/api/blogs');
+describe('delete requests', () => {
 
-    expect(response.body[0]['id']).toBeDefined();
+    test('delete a blog works', async () => {
+
+        let response = await api.get('/api/blogs').expect(200);
+
+        const initialLength = response.body.length;
+
+        await api.delete('/api/blogs/' + response.body[0]['id']).expect(200);
+
+        response = await api.get('/api/blogs').expect(200);
+
+        expect(response.body).toHaveLength(initialLength - 1);
+    });
 });
 
+describe('put requests', () => {
 
-test('create a blog works', async () => {
-    const newBlog =
+    test('update a blog works', async () => {
+
+        const newBlogInfo =
         {
-            title : 'Summer',
-            author : 'Cat',
-            url : 'http://estrella.com',
-            likes: 1
+            title : 'Christmas',
+            author : 'Santa',
+            url : 'http://awesome.com',
+            likes: 20
         };
 
+        let response = await api.get('/api/blogs').expect(200);
 
-    await api.post('/api/blogs').send(newBlog).expect(201);
+        await api.put('/api/blogs/' + response.body[0]['id']).send(newBlogInfo).expect(200);
 
-    const response = await api.get('/api/blogs');
-    expect(response.body).toHaveLength(3);
+        response = await api.get('/api/blogs').expect(200);
 
-    const dbResponse = await Blog.find( { 'title':'Summer' } );
-    expect(dbResponse).toBeDefined();
+        expect(response.body[0]['likes']).toBe(20);
+    });
 });
-
-test('create a blog without likes info defaults to likes = 0', async () => {
-    const newBlog =
-        {
-            title : 'Opera',
-            author : 'Figaro',
-            url : 'http://teatro.com'
-        };
-
-
-    await api.post('/api/blogs', newBlog).send(newBlog).expect(201);
-
-    await api.get('/api/blogs').expect(200);
-
-    const dbResponse = await Blog.findOne( { 'title':'Opera' } );
-    expect(dbResponse['likes']).toBe(0);
-});
-
-test('trying to create a blog without title or url results in a 400 Bad Request error', async () => {
-    const newBlog =
-        {
-            author : 'Puma'
-        };
-
-
-    await api.post('/api/blogs', newBlog).send(newBlog).expect(400);
-
-});
-
 
 
 afterAll(() => {
