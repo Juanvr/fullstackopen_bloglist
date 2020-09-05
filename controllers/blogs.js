@@ -1,7 +1,7 @@
 const blogsRouter = require('express').Router();
 const Blog = require('../models/blog');
-const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+
 
 blogsRouter.get('/', async (request, response) => {
 
@@ -15,19 +15,11 @@ blogsRouter.post('/', async (request, response) => {
 
     const token = request.token;
 
-    let decodedToken = '';
-    try {
-        decodedToken =  await jwt.verify(token, process.env.SECRET);
-    } catch(err) {
-        return response.status(401).json({ error: 'token missing or invalid' });
-    }
-
-    if (!token || !decodedToken.id) {
+    if (!token || !token.id){
         response.status(401).json({ error: 'token missing or invalid' });
-        return;
     }
 
-    const user = await User.findById(decodedToken.id);
+    const user = await User.findById(token.id);
 
     if (!request.body.likes){
         request.body.likes = 0;
@@ -52,7 +44,25 @@ blogsRouter.post('/', async (request, response) => {
 
 
 blogsRouter.delete('/:id', async (request, response) => {
+    const token = request.token;
+
+    if (!token || !token.id){
+        return response.status(401).json({ error: 'token missing or invalid' });
+    }
+
+    const user = await User.findById(token.id);
+
     const id = request.params.id;
+
+    const blogToDelete = await Blog.findOne({ '_id' : id });
+
+    if (!blogToDelete){
+        return response.status(404).json({ error: 'blog specified not found' });
+    }
+    if (blogToDelete.user.toString() !== user._id.toString()){
+        return response.status(401).json({ error: 'blog does not belong to user' });
+    }
+
 
     const  result = await Blog.deleteOne( { '_id' : id } );
 
@@ -60,6 +70,26 @@ blogsRouter.delete('/:id', async (request, response) => {
 });
 
 blogsRouter.put('/:id', async (request, response) => {
+
+    const token = request.token;
+
+    if (!token || !token.id){
+        return response.status(401).json({ error: 'token missing or invalid' });
+    }
+
+    const user = await User.findById(token.id);
+
+    const id = request.params.id;
+
+    const blogToUpdate = await Blog.findOne({ '_id' : id });
+
+    if (!blogToUpdate){
+        return response.status(404).json({ error: 'blog specified not found' });
+    }
+    if (blogToUpdate.user.toString() !== user._id.toString()){
+        return response.status(401).json({ error: 'blog does not belong to user' });
+    }
+
     const blog = request.body;
 
     const updatedBlog = await  Blog.findByIdAndUpdate(request.params.id, blog, { new: true });

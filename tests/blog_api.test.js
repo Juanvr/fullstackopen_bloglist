@@ -22,17 +22,18 @@ const initialBlogs = [
 ];
 
 let token = '';
+let user = {};
 
 beforeAll( async () => {
 
-    const user = {
+    const userData = {
         'username' : 'test',
         'password' : 'PasswordDePuma',
         'name' : 'El señor puma',
         'blogs' : []
     };
 
-    const userResults = await User.find( { 'username' : user.username } );
+    const userResults = await User.find( { 'username' : userData.username } );
     if (userResults.length > 0 ){
         const userDb = userResults[0];
         console.log(userDb);
@@ -40,9 +41,11 @@ beforeAll( async () => {
         await api.delete('/api/users/' + userDb._id).expect(200);
     }
 
-    await api.post('/api/users', user).send(user).expect(201);
+    const response = await api.post('/api/users', userData).send(userData).expect(201);
 
-    const loginResponse = await api.post('/api/login', user).send(user).expect(200);
+    user = response.body;
+
+    const loginResponse = await api.post('/api/login', userData).send(userData).expect(200);
 
     token = loginResponse.body.token;
 
@@ -51,10 +54,10 @@ beforeAll( async () => {
 beforeEach(async () => {
     await Blog.deleteMany({});
 
-    let blogObject = new Blog(initialBlogs[0]);
+    let blogObject = new Blog( { ...initialBlogs[0], 'user' : user.id });
     await blogObject.save();
 
-    blogObject = new Blog(initialBlogs[1]);
+    blogObject = new Blog( { ...initialBlogs[1], 'user' : user.id });
     await blogObject.save();
 });
 
@@ -161,7 +164,10 @@ describe('delete requests', () => {
 
         const initialLength = response.body.length;
 
-        await api.delete('/api/blogs/' + response.body[0]['id']).expect(200);
+        await api
+            .delete('/api/blogs/' + response.body[0]['id'])
+            .set('Authorization', 'bearer ' + token)
+            .expect(200);
 
         response = await api.get('/api/blogs').expect(200);
 
@@ -183,7 +189,11 @@ describe('put requests', () => {
 
         let response = await api.get('/api/blogs').expect(200);
 
-        await api.put('/api/blogs/' + response.body[0]['id']).send(newBlogInfo).expect(200);
+        await api
+            .put('/api/blogs/' + response.body[0]['id'])
+            .set('Authorization', 'bearer ' + token)
+            .send(newBlogInfo)
+            .expect(200);
 
         response = await api.get('/api/blogs').expect(200);
 
