@@ -5,18 +5,18 @@ const app = require('../app');
 const api = supertest(app);
 const User = require('../models/user');
 
-const initialUsers = [
-    {
-        username : 'Christmas',
-        password : 'Santa',
-        name : 'http://awesome.com'
-    },
-    {
-        username : 'Puma',
-        password : 'Santa',
-        name : 'http://awesome.com'
-    }
-];
+// const initialUsers = [
+//     {
+//         username : 'Christmas',
+//         password : 'Santa',
+//         name : 'http://awesome.com'
+//     },
+//     {
+//         username : 'Puma',
+//         password : 'Santa',
+//         name : 'http://awesome.com'
+//     }
+// ];
 
 beforeEach(async () => {
     await User.deleteMany({});
@@ -88,7 +88,7 @@ describe('create new user works', () => {
             .send(newUser)
             .expect(400);
 
-        expect(result.text).toContain('3 characters long');
+        expect(result.text).toContain('User already exists');
     });
 
 });

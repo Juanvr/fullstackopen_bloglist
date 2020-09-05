@@ -54,7 +54,8 @@ usersRouter.post('/', async (request, response) => {
         {
             username: body.username,
             name: body.name,
-            password: passwordHash
+            password: passwordHash,
+            blogs:[]
         }
     );
 
@@ -66,6 +67,7 @@ usersRouter.post('/', async (request, response) => {
 usersRouter.delete('/:id', async (request, response) => {
     const id = request.params.id;
 
+    console.log('recibido id: ', id);
     const  result = await User.deleteOne( { '_id' : id } );
 
     response.status(200).json(result);

@@ -4,6 +4,7 @@ const app = require('../app');
 
 const api = supertest(app);
 const Blog = require('../models/blog');
+const User = require('../models/user');
 
 const initialBlogs = [
     {
@@ -19,6 +20,33 @@ const initialBlogs = [
         likes: 10
     },
 ];
+
+let token = '';
+
+beforeAll( async () => {
+
+    const user = {
+        'username' : 'test',
+        'password' : 'PasswordDePuma',
+        'name' : 'El señor puma',
+        'blogs' : []
+    };
+
+    const userResults = await User.find( { 'username' : user.username } );
+    if (userResults.length > 0 ){
+        const userDb = userResults[0];
+        console.log(userDb);
+        console.log('url::', '/api/users/' + userDb._id);
+        await api.delete('/api/users/' + userDb._id).expect(200);
+    }
+
+    await api.post('/api/users', user).send(user).expect(201);
+
+    const loginResponse = await api.post('/api/login', user).send(user).expect(200);
+
+    token = loginResponse.body.token;
+
+});
 
 beforeEach(async () => {
     await Blog.deleteMany({});
@@ -68,6 +96,7 @@ describe('blogs structure', () => {
 describe('create requests', () => {
 
     test('create a blog works', async () => {
+
         const newBlog =
             {
                 title : 'Summer',
@@ -77,13 +106,14 @@ describe('create requests', () => {
             };
 
 
-        await api.post('/api/blogs').send(newBlog).expect(201);
-
-        const response = await api.get('/api/blogs');
-        expect(response.body).toHaveLength(3);
+        await api.post('/api/blogs')
+            .set('Authorization', 'bearer ' + token)
+            .send(newBlog)
+            .expect(201);
 
         const dbResponse = await Blog.find( { 'title':'Summer' } );
-        expect(dbResponse).toBeDefined();
+
+        expect(dbResponse[0]).toBeDefined();
     });
 
     test('create a blog without likes info defaults to likes = 0', async () => {
@@ -95,7 +125,11 @@ describe('create requests', () => {
             };
 
 
-        await api.post('/api/blogs', newBlog).send(newBlog).expect(201);
+        await api
+            .post('/api/blogs', newBlog)
+            .set('Authorization', 'bearer ' + token)
+            .send(newBlog)
+            .expect(201);
 
         await api.get('/api/blogs').expect(200);
 
@@ -110,7 +144,11 @@ describe('create requests', () => {
             };
 
 
-        await api.post('/api/blogs', newBlog).send(newBlog).expect(400);
+        await api
+            .post('/api/blogs', newBlog)
+            .set('Authorization', 'bearer ' + token)
+            .send(newBlog)
+            .expect(400);
 
     });
 });
