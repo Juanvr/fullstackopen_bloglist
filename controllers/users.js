@@ -4,7 +4,7 @@ const User = require('../models/user');
 
 usersRouter.get('/', async (request, response) => {
 
-    const users = await User.find({});
+    const users = await User.find({}).populate('blogs');
 
     response.json(users);
 
@@ -39,10 +39,10 @@ usersRouter.post('/', async (request, response) => {
         return;
     }
 
-    const sameUserCount = await User.count({'username': body.username});
+    const sameUserCount = await User.count({ 'username': body.username });
     if(sameUserCount > 0 ){
         response.status(400);
-        response.send('Password must be at least 3 characters long');
+        response.send('User already exists');
         return;
     }
 

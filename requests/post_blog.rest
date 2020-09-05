@@ -1,6 +1,6 @@
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3RhIiwiaWQiOiI1ZjMyN2JkMDBjMmZiYTIwMzQ5MTZjM2YiLCJpYXQiOjE1OTczMTA3NjV9.KQVIRPlaqaCAXRv-eUgE2mADYCzPoEvx-wvEpJmL8CY
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjVmNTMzZGFmY2JmYTg4MTk5ODVlNGU4NiIsImlhdCI6MTU5OTI5MTY2MH0.10nmnX97GrDTlkLBwCA8BMEnVztTWe-VPkBaWh4Eo34
 
 {
     "title": "Christmas",

@@ -44,12 +44,12 @@ describe('create new user works', () => {
             .send(newUser)
             .expect(201)
             .expect('Content-Type', /application\/json/);
-        
+
         console.log(response.body);
-        
+
         const userMongo = await User.findById(response.body.id);
-        console.log("response mongo", userMongo);
-        expect(userMongo).toHaveProperty("username");
+        console.log('response mongo', userMongo);
+        expect(userMongo).toHaveProperty('username');
     });
 
     test('creation without username returns 400', async () => {
@@ -58,7 +58,7 @@ describe('create new user works', () => {
             name : 'El señor puma'
         };
 
-        const response = await api
+        await api
             .post('/api/users')
             .send(newUser)
             .expect(400);
@@ -70,7 +70,7 @@ describe('create new user works', () => {
             name : 'El señor puma'
         };
 
-        const response = await api
+        await api
             .post('/api/users')
             .send(newUser)
             .expect(400);
@@ -84,14 +84,14 @@ describe('create new user works', () => {
         };
 
         const result = await api
-        .post('/api/users')
-        .send(newUser)
-        .expect(400);
+            .post('/api/users')
+            .send(newUser)
+            .expect(400);
 
-        expect(result.text).toContain('3 characters long')
+        expect(result.text).toContain('3 characters long');
     });
 
-})
+});
 
 afterAll(() => {
     mongoose.connection.close();
