@@ -1,0 +1,27 @@
+PUT http://localhost:3003/api/blogs/5f5c976e491f2f2cacc97024
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjVmNTMzZGFmY2JmYTg4MTk5ODVlNGU4NiIsImlhdCI6MTU5OTI5MTY2MH0.10nmnX97GrDTlkLBwCA8BMEnVztTWe-VPkBaWh4Eo34
+
+{
+    "author": "a",
+    "id": "5f5c976e491f2f2cacc97024",
+    "likes": 1,
+    "title": "a",
+    "url": "a",
+    "user": {
+        "blogs": [
+            "5f53412f6c773345c441e265",
+            "5f53447b3c51ce3e3c428bf7",
+            "5f5c976e491f2f2cacc97024",
+            "5f5c986b491f2f2cacc97025",
+            "5f5c98e2491f2f2cacc97026",
+            "5f5c9dc9491f2f2cacc97027",
+            "5f5d077b491f2f2cacc97028"
+        ],
+        "id": "5f533dafcbfa8819985e4e86",
+        "name": "El señor puma",
+        "username": "root"
+    }
+}
+
+

@@ -90,7 +90,7 @@ blogsRouter.put('/:id', async (request, response) => {
         return response.status(401).json({ error: 'blog does not belong to user' });
     }
 
-    const blog = request.body;
+    const blog = { ...request.body, user : request.body.user.id };
 
     const updatedBlog = await  Blog.findByIdAndUpdate(request.params.id, blog, { new: true });
 
